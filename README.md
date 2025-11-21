@@ -8,6 +8,19 @@ This repo is a full-stack implementation of an LLM like ChatGPT in a single, cle
 
 ## Quick start
 
+### Using the five love languages interactive page
+
+This repo now includes a standalone experience that lives at `nanochat/ui.html`.
+
+1. Clone/download the repo and stay at the project root.
+2. Start a simple static server so modern browsers load assets correctly (any port is fine):
+   ```bash
+   python -m http.server 8000 -d nanochat
+   ```
+3. Visit [http://localhost:8000/ui.html](http://localhost:8000/ui.html) in your browser to walk through the multi轮问答和结果页。
+
+If you want to embed this page elsewhere, copy `nanochat/ui.html` and the optional `logo.svg` asset into your own static site and serve them the same way.
+
 The fastest way to feel the magic is to run the speedrun script [speedrun.sh](speedrun.sh), which trains and inferences the $100 tier of nanochat. On an 8XH100 node at $24/hr, this gives a total run time of about 4 hours. Boot up a new 8XH100 GPU box from your favorite provider (e.g. I use and like [Lambda](https://lambda.ai/service/gpu-cloud)), and kick off the training script:
 
 ```bash
