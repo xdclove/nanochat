@@ -38,7 +38,7 @@
         header {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 32px 20px 12px;
+            padding: 20px 16px 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -66,33 +66,39 @@
         main {
             max-width: 1200px;
             margin: 0 auto 32px;
-            padding: 0 20px 48px;
+            padding: 0 16px 48px;
             display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 20px;
+            grid-template-columns: 1fr;
+            gap: 14px;
         }
 
-        @media (max-width: 960px) {
-            main { grid-template-columns: 1fr; }
-            header { flex-direction: column; align-items: flex-start; }
+        @media (min-width: 960px) {
+            main { grid-template-columns: 280px 1fr; gap: 20px; }
+            header { padding: 32px 20px 12px; flex-direction: row; align-items: center; }
+            .side-card { position: sticky; top: 16px; padding: 20px; }
+            .story-step { min-width: auto; }
         }
 
         .side-card {
-            position: sticky;
-            top: 16px;
+            position: relative;
+            top: 0;
             align-self: start;
             background: var(--card);
             border: var(--soft-border);
             border-radius: 18px;
-            padding: 20px;
+            padding: 14px;
             box-shadow: var(--shadow);
         }
 
         .story-title { font-weight: 700; margin-bottom: 12px; }
 
-        .story-steps { display: grid; gap: 12px; }
+        .story-steps { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+
+        .story-steps::-webkit-scrollbar { height: 6px; }
+        .story-steps::-webkit-scrollbar-thumb { background: rgba(142, 122, 209, 0.28); border-radius: 999px; }
 
         .story-step {
+            min-width: 180px;
             display: grid;
             grid-template-columns: 28px 1fr;
             gap: 10px;
@@ -118,7 +124,7 @@
             border-radius: 22px;
             border: var(--soft-border);
             box-shadow: var(--shadow);
-            padding: 24px;
+            padding: 18px;
             margin-bottom: 18px;
         }
 
@@ -157,7 +163,20 @@
         button.primary:hover { transform: translateY(-1px); box-shadow: 0 12px 34px rgba(142, 122, 209, 0.4); }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .question-group { display: grid; gap: 18px; }
+        @media (max-width: 720px) {
+            header { flex-direction: column; align-items: flex-start; }
+            .navigation { flex-wrap: wrap; justify-content: center; }
+            .navigation button { flex: 1 1 140px; }
+            .option { font-size: 16px; }
+            .radar { height: 260px; }
+            .slider-row { grid-template-columns: 1fr; }
+            .bar-row { grid-template-columns: 1fr 64px; grid-template-areas: "label value" "bar bar"; align-items: center; }
+            .bar-row > div:nth-child(1) { grid-area: label; }
+            .bar-row > div:nth-child(2) { grid-area: bar; }
+            .bar-row > div:nth-child(3) { grid-area: value; justify-self: end; }
+        }
+
+        .question-group { display: grid; gap: 14px; }
 
         .question {
             padding: 16px;
@@ -172,8 +191,8 @@
         .options { display: grid; gap: 10px; margin-top: 10px; }
 
         .option {
-            padding: 12px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 14px;
             border: var(--soft-border);
             background: #f7f5fa;
             display: flex;
@@ -181,15 +200,7 @@
             align-items: center;
             cursor: pointer;
             transition: all 0.15s ease;
-        }
-
-        .option .badge {
-            padding: 4px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            color: #3a2f3f;
-            border: var(--soft-border);
-            background: #fff;
+            touch-action: manipulation;
         }
 
         .option:hover { transform: translateY(-1px); }
@@ -252,7 +263,7 @@
 
         .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
 
-        .bar-row { display: grid; grid-template-columns: 120px 1fr 48px; align-items: center; gap: 8px; }
+        .bar-row { display: grid; grid-template-columns: minmax(96px, 1.2fr) 2fr 48px; align-items: center; gap: 8px; }
         .bar-track { height: 10px; border-radius: 999px; background: #f0ebff; overflow: hidden; }
         .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #8e7ad1, #c4b2ff); transition: width 0.3s ease; }
 
@@ -293,6 +304,57 @@
         .radar .legend { position: absolute; bottom: 12px; left: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
         .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
         .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        .result-panel { position: relative; overflow: hidden; isolation: isolate; }
+        .result-panel > * { position: relative; z-index: 1; }
+        .result-panel::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto -20%;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle at 30% 40%, rgba(142, 122, 209, 0.35), transparent 55%);
+            filter: blur(18px);
+            opacity: 0.8;
+            animation: pulseGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .result-panel::after {
+            content: '';
+            position: absolute;
+            inset: auto -20% -50% auto;
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle at 60% 60%, rgba(204, 230, 213, 0.3), transparent 60%);
+            filter: blur(20px);
+            opacity: 0.7;
+            animation: pulseGlow 9s ease-in-out infinite reverse;
+            pointer-events: none;
+        }
+
+        .sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .sparkles span {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(142, 122, 209, 0.35);
+            animation: floatUp 10s linear infinite;
+            filter: blur(0.5px);
+        }
+        .sparkles span:nth-child(odd) { background: rgba(204, 230, 213, 0.35); animation-duration: 12s; }
+        .sparkles span:nth-child(3n) { width: 8px; height: 8px; animation-duration: 9s; }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-6px) scale(1.03); opacity: 1; }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(30px) scale(1); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-320px) scale(1.1); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -598,7 +660,7 @@
                 q.options.forEach(opt => {
                     const btn = document.createElement('div');
                     btn.className = 'option';
-                    btn.innerHTML = `<div class="badge">${loveLanguages[opt.tag].name}</div><div>${opt.label}</div>`;
+                    btn.textContent = opt.label;
                     btn.onclick = () => selectOption(q.id, opt, q.weight);
                     btn.dataset.question = q.id;
                     btn.dataset.lang = opt.tag;
@@ -678,7 +740,7 @@
                 q.options.forEach(opt => {
                     const btn = document.createElement('div');
                     btn.className = 'option';
-                    btn.innerHTML = `<div class="badge">${loveLanguages[opt.tag].name}</div><div>${opt.label}</div>`;
+                    btn.textContent = opt.label;
                     btn.onclick = () => selectOption(q.id, opt, 2);
                     btn.dataset.question = q.id;
                     btn.dataset.lang = opt.tag;
@@ -760,7 +822,7 @@
             sliderQuestions.forEach(q => {
                 const row = document.createElement('div');
                 row.className = 'slider-row';
-                row.innerHTML = `<div><strong>${q.title}</strong><div class="progress-label">${loveLanguages[q.tag].name}</div></div>`;
+                row.innerHTML = `<div><strong>${q.title}</strong><div class="progress-label">左右滑动，1-5 分</div></div>`;
                 const ctrl = document.createElement('div');
                 const range = document.createElement('input');
                 range.type = 'range';
@@ -811,7 +873,7 @@
             content.innerHTML = '';
             const panel = document.createElement('div');
             panel.className = 'panel';
-            panel.innerHTML = `<h2>排序 · 只能保留 3 种</h2><p>拖动排序，选择你最想保留的 3 种爱别人的方式。</p>`;
+            panel.innerHTML = `<h2>排序 · 只能保留 3 种</h2><p>拖动（或轻触让它到最前）排序，选择你最想保留的 3 种爱别人的方式。</p>`;
             const list = document.createElement('div');
             list.className = 'rank-list';
             rankingOptions.forEach(opt => {
@@ -819,7 +881,12 @@
                 item.className = 'rank-item';
                 item.draggable = true;
                 item.dataset.id = opt.id;
-                item.innerHTML = `<div class="rank-handle">☰</div><div class="rank-label">${opt.label}</div><div class="badge">${loveLanguages[opt.tag].name}</div>`;
+                item.innerHTML = `<div class="rank-handle">☰</div><div class="rank-label">${opt.label}</div>`;
+                item.addEventListener('click', () => {
+                    if (window.matchMedia('(pointer: coarse)').matches) {
+                        list.insertBefore(item, list.firstChild);
+                    }
+                });
                 list.appendChild(item);
             });
             enableDrag(list);
@@ -987,7 +1054,7 @@
             const top2 = topLanguages(normalized);
             content.innerHTML = '';
             const panel = document.createElement('div');
-            panel.className = 'panel';
+            panel.className = 'panel result-panel';
             panel.innerHTML = `<h2>你的爱语画像</h2><p>这是基于刚才所有选择得出的偏好分布。分数以最高维度为 100 做归一化。</p>`;
             const radar = document.createElement('div');
             radar.className = 'radar';
@@ -1001,6 +1068,16 @@
             });
             radar.appendChild(legend);
             panel.appendChild(radar);
+
+            const sparkles = document.createElement('div');
+            sparkles.className = 'sparkles';
+            Array.from({ length: 8 }).forEach(() => {
+                const dot = document.createElement('span');
+                dot.style.left = `${Math.random() * 100}%`;
+                dot.style.bottom = `${Math.random() * 40}%`;
+                sparkles.appendChild(dot);
+            });
+            panel.appendChild(sparkles);
 
             const bars = document.createElement('div');
             bars.className = 'question-group';
