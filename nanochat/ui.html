@@ -1,561 +1,1182 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NanoChat</title>
-    <link rel="icon" type="image/svg+xml" href="/logo.svg">
+    <title>爱的五种语言 · 互动探索</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <style>
         :root {
             color-scheme: light;
+            --bg: #f8f5f2;
+            --card: #ffffff;
+            --ink: #3a2f3f;
+            --muted: #6f6572;
+            --accent: #8e7ad1;
+            --accent-2: #d7c7f4;
+            --shadow: 0 18px 40px rgba(34, 29, 46, 0.08);
+            --soft-border: 1px solid rgba(142, 122, 209, 0.18);
+            --pt: #f0c6c6;
+            --as: #c3d6f4;
+            --qt: #cce6d5;
+            --wa: #f7d9b6;
+            --rg: #e0d3f2;
         }
 
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
 
         body {
-            font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol";
-            background-color: #ffffff;
-            color: #111827;
+            margin: 0;
+            font-family: "Inter", "PingFang SC", "Helvetica", system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(215, 199, 244, 0.35), transparent 30%),
+                        radial-gradient(circle at 80% 0%, rgba(204, 230, 213, 0.35), transparent 28%),
+                        var(--bg);
+            color: var(--ink);
             min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
         }
 
-        .header {
-            background-color: #ffffff;
-            padding: 1.25rem 1.5rem;
-        }
-
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .header-logo {
-            height: 32px;
-            width: auto;
-        }
-
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin: 0;
-            color: #111827;
-        }
-
-        .new-conversation-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            background-color: #ffffff;
-            color: #6b7280;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .new-conversation-btn:hover {
-            background-color: #f3f4f6;
-            border-color: #d1d5db;
-            color: #374151;
-        }
-
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            background-color: #ffffff;
-        }
-
-        .chat-wrapper {
-            max-width: 48rem;
+        header {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 1.5rem 3rem;
+            padding: 20px 16px 8px;
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
         }
 
-        .message {
+        .brand {
             display: flex;
-            justify-content: flex-start;
-            margin-bottom: 0.5rem;
-            color: #0d0d0d;
+            align-items: center;
+            gap: 12px;
+            color: var(--ink);
+            font-weight: 700;
+            letter-spacing: 0.4px;
         }
 
-        .message.assistant {
-            justify-content: flex-start;
+        .pill {
+            padding: 6px 12px;
+            border-radius: 999px;
+            border: var(--soft-border);
+            background: rgba(142, 122, 209, 0.08);
+            color: var(--ink);
+            font-size: 12px;
         }
 
-        .message.user {
-            justify-content: flex-end;
+        main {
+            max-width: 1200px;
+            margin: 0 auto 32px;
+            padding: 0 16px 48px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
         }
 
-        .message-content {
-            white-space: pre-wrap;
-            line-height: 1.6;
-            max-width: 100%;
+        @media (min-width: 960px) {
+            main { grid-template-columns: 280px 1fr; gap: 20px; }
+            header { padding: 32px 20px 12px; flex-direction: row; align-items: center; }
+            .side-card { position: sticky; top: 16px; padding: 20px; }
+            .story-step { min-width: auto; }
         }
 
-        .message.assistant .message-content {
-            background: transparent;
+        .side-card {
+            position: relative;
+            top: 0;
+            align-self: start;
+            background: var(--card);
+            border: var(--soft-border);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .story-title { font-weight: 700; margin-bottom: 12px; }
+
+        .story-steps { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+
+        .story-steps::-webkit-scrollbar { height: 6px; }
+        .story-steps::-webkit-scrollbar-thumb { background: rgba(142, 122, 209, 0.28); border-radius: 999px; }
+
+        .story-step {
+            min-width: 180px;
+            display: grid;
+            grid-template-columns: 28px 1fr;
+            gap: 10px;
+            align-items: start;
+            color: var(--muted);
+        }
+
+        .story-step .dot {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            border: var(--soft-border);
+            display: grid; place-items: center;
+            background: #f3f0ff;
+            font-size: 12px;
+            color: var(--ink);
+        }
+
+        .story-step.active .dot { background: var(--accent); color: #fff; border-color: transparent; }
+        .story-step.active .text { color: var(--ink); font-weight: 600; }
+
+        .panel {
+            background: var(--card);
+            border-radius: 22px;
+            border: var(--soft-border);
+            box-shadow: var(--shadow);
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .panel h2 { margin: 0 0 8px; font-size: 22px; }
+        .panel p { margin: 0 0 12px; color: var(--muted); line-height: 1.6; }
+
+        .hero {
+            display: grid;
+            gap: 14px;
+        }
+
+        .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        button.primary {
+            background: linear-gradient(135deg, #8e7ad1, #c4b2ff);
             border: none;
-            padding: 0.25rem 0;
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 18px;
+            font-weight: 700;
             cursor: pointer;
-            border-radius: 0.5rem;
-            padding: 0.5rem;
-            margin-left: -0.5rem;
-            transition: background-color 0.2s ease;
+            box-shadow: 0 10px 30px rgba(142, 122, 209, 0.35);
+            transition: transform 0.15s ease, box-shadow 0.2s ease;
         }
 
-        .message.assistant .message-content:hover {
-            background-color: #f9fafb;
-        }
-
-        .message.user .message-content {
-            background-color: #f3f4f6;
-            border-radius: 1.25rem;
-            padding: 0.8rem 1rem;
-            max-width: 65%;
+        button.secondary {
+            border: var(--soft-border);
+            background: rgba(142, 122, 209, 0.07);
+            color: var(--ink);
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
         }
 
-        .message.user .message-content:hover {
-            background-color: #e5e7eb;
+        button.primary:hover { transform: translateY(-1px); box-shadow: 0 12px 34px rgba(142, 122, 209, 0.4); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        @media (max-width: 720px) {
+            header { flex-direction: column; align-items: flex-start; }
+            .navigation { flex-wrap: wrap; justify-content: center; }
+            .navigation button { flex: 1 1 140px; }
+            .option { font-size: 16px; }
+            .radar { height: 260px; }
+            .slider-row { grid-template-columns: 1fr; }
+            .bar-row { grid-template-columns: 1fr 64px; grid-template-areas: "label value" "bar bar"; align-items: center; }
+            .bar-row > div:nth-child(1) { grid-area: label; }
+            .bar-row > div:nth-child(2) { grid-area: bar; }
+            .bar-row > div:nth-child(3) { grid-area: value; justify-self: end; }
         }
 
-        .message.console .message-content {
-            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'Courier New', monospace;
-            font-size: 0.875rem;
-            background-color: #fafafa;
-            padding: 0.75rem 1rem;
-            color: #374151;
-            max-width: 80%;
+        .question-group { display: grid; gap: 14px; }
+
+        .question {
+            padding: 16px;
+            border-radius: 16px;
+            border: var(--soft-border);
+            background: rgba(255,255,255,0.7);
         }
 
-        .input-container {
-            background-color: #ffffff;
-            padding: 1rem;
-        }
+        .question h3 { margin: 0 0 8px; font-size: 18px; }
+        .question small { color: var(--muted); }
 
-        .input-wrapper {
-            max-width: 48rem;
-            margin: 0 auto;
+        .options { display: grid; gap: 10px; margin-top: 10px; }
+
+        .option {
+            padding: 14px;
+            border-radius: 14px;
+            border: var(--soft-border);
+            background: #f7f5fa;
             display: flex;
-            gap: 0.75rem;
-            align-items: flex-end;
+            gap: 10px;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            touch-action: manipulation;
         }
 
-        .chat-input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            background-color: #ffffff;
-            color: #111827;
-            font-size: 1rem;
-            line-height: 1.5;
-            resize: none;
-            outline: none;
-            min-height: 54px;
-            max-height: 200px;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        .option:hover { transform: translateY(-1px); }
+        .option.selected { border-color: var(--accent); background: #f0ebff; box-shadow: 0 6px 16px rgba(142, 122, 209, 0.15); }
+
+        .navigation {
+            margin-top: 18px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
         }
 
-        .chat-input::placeholder {
-            color: #9ca3af;
+        .progress-label {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 12px;
         }
 
-        .chat-input:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        .mini-feedback {
+            margin-top: 12px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(142, 122, 209, 0.1);
+            color: var(--muted);
+            font-size: 13px;
         }
 
-        .send-button {
-            flex-shrink: 0;
-            padding: 0;
-            width: 54px;
-            height: 54px;
-            border: 1px solid #111827;
-            border-radius: 0.75rem;
-            background-color: #111827;
-            color: #ffffff;
+        .slider-row {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border-radius: 12px;
+            border: var(--soft-border);
+            background: #f7f5fa;
+        }
+
+        .slider-row input[type="range"] { width: 100%; accent-color: var(--accent); }
+
+        .rank-list { display: grid; gap: 10px; margin-top: 10px; }
+
+        .rank-item {
+            padding: 12px;
+            border-radius: 12px;
+            border: var(--soft-border);
+            background: #fff;
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            gap: 10px;
+            cursor: grab;
         }
 
-        .send-button:hover:not(:disabled) {
-            background-color: #2563eb;
-            border-color: #2563eb;
+        .rank-handle { font-size: 18px; color: var(--muted); }
+        .rank-label { flex: 1; }
+
+        .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+        .tab-btn { padding: 10px 12px; border-radius: 10px; border: var(--soft-border); background: #f7f5fa; cursor: pointer; }
+        .tab-btn.active { background: #f0ebff; border-color: var(--accent); }
+
+        .result-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+
+        .bar-row { display: grid; grid-template-columns: minmax(96px, 1.2fr) 2fr 48px; align-items: center; gap: 8px; }
+        .bar-track { height: 10px; border-radius: 999px; background: #f0ebff; overflow: hidden; }
+        .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #8e7ad1, #c4b2ff); transition: width 0.3s ease; }
+
+        .share-box { width: 100%; border-radius: 12px; border: var(--soft-border); padding: 12px; background: #f7f5fa; }
+
+        .tag { padding: 4px 8px; border-radius: 10px; font-size: 12px; color: #3a2f3f; border: var(--soft-border); background: #fff; }
+
+        .reflection textarea {
+            width: 100%;
+            min-height: 90px;
+            padding: 12px;
+            border-radius: 12px;
+            border: var(--soft-border);
+            font-family: inherit;
+            resize: vertical;
         }
 
-        .send-button:disabled {
-            cursor: not-allowed;
-            border-color: #d1d5db;
-            background-color: #e5e7eb;
-            color: #9ca3af;
+        .select {
+            padding: 12px;
+            border-radius: 12px;
+            border: var(--soft-border);
+            background: #fff;
+            width: 100%;
         }
 
-        .typing-indicator {
-            display: inline-block;
-            color: #6b7280;
-            letter-spacing: 0.15em;
+        .radar {
+            width: 100%;
+            height: 320px;
+            background: #fff;
+            border-radius: 16px;
+            border: var(--soft-border);
+            display: grid;
+            place-items: center;
+            position: relative;
         }
 
-        .typing-indicator::after {
-            content: '···';
-            animation: typing 1.4s infinite;
+        .radar svg { width: 100%; height: 100%; }
+        .radar .legend { position: absolute; bottom: 12px; left: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .legend span { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+        .legend i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+        .result-panel { position: relative; overflow: hidden; isolation: isolate; }
+        .result-panel > * { position: relative; z-index: 1; }
+        .result-panel::before {
+            content: '';
+            position: absolute;
+            inset: -40% auto auto -20%;
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle at 30% 40%, rgba(142, 122, 209, 0.35), transparent 55%);
+            filter: blur(18px);
+            opacity: 0.8;
+            animation: pulseGlow 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        .result-panel::after {
+            content: '';
+            position: absolute;
+            inset: auto -20% -50% auto;
+            width: 360px;
+            height: 360px;
+            background: radial-gradient(circle at 60% 60%, rgba(204, 230, 213, 0.3), transparent 60%);
+            filter: blur(20px);
+            opacity: 0.7;
+            animation: pulseGlow 9s ease-in-out infinite reverse;
+            pointer-events: none;
         }
 
-        @keyframes typing {
-            0%, 60%, 100% { opacity: 0.2; }
-            30% { opacity: 1; }
+        .sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 0; }
+        .sparkles span {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(142, 122, 209, 0.35);
+            animation: floatUp 10s linear infinite;
+            filter: blur(0.5px);
+        }
+        .sparkles span:nth-child(odd) { background: rgba(204, 230, 213, 0.35); animation-duration: 12s; }
+        .sparkles span:nth-child(3n) { width: 8px; height: 8px; animation-duration: 9s; }
+
+        @keyframes pulseGlow {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.8; }
+            50% { transform: translateY(-6px) scale(1.03); opacity: 1; }
         }
 
-        .error-message {
-            background-color: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #b91c1c;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            margin-top: 0.5rem;
+        @keyframes floatUp {
+            0% { transform: translateY(30px) scale(1); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-320px) scale(1.1); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-left">
-            <button class="new-conversation-btn" onclick="newConversation()" title="New Conversation (Ctrl+Shift+N)">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5v14"></path>
-                    <path d="M5 12h14"></path>
-                </svg>
-            </button>
-            <h1>nanochat</h1>
+    <header>
+        <div class="brand">
+            <img src="logo.svg" alt="logo" width="28" height="28">
+            <div>
+                <div>爱语自测 · 5 分钟</div>
+                <small style="color: var(--muted);">温柔陪伴版，像聊天一样完成</small>
+            </div>
         </div>
-    </div>
+        <div class="pill">不存储隐私 · 不是诊断，仅是关系小工具</div>
+    </header>
 
-    <div class="chat-container" id="chatContainer">
-        <div class="chat-wrapper" id="chatWrapper">
-            <!-- Messages will be added here -->
-        </div>
-    </div>
+    <main>
+        <aside class="side-card">
+            <div class="story-title">小旅程</div>
+            <div class="story-steps" id="storySteps"></div>
+        </aside>
 
-    <div class="input-container">
-        <div class="input-wrapper">
-            <textarea
-                id="chatInput"
-                class="chat-input"
-                placeholder="Ask anything"
-                rows="1"
-                onkeydown="handleKeyDown(event)"
-            ></textarea>
-            <button id="sendButton" class="send-button" onclick="sendMessage()" disabled>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 2L11 13"></path>
-                    <path d="M22 2l-7 20-4-9-9-4 20-7z"></path>
-                </svg>
-            </button>
-        </div>
-    </div>
+        <section id="content"></section>
+    </main>
 
     <script>
-        const API_URL = '';
-        const chatContainer = document.getElementById('chatContainer');
-        const chatWrapper = document.getElementById('chatWrapper');
-        const chatInput = document.getElementById('chatInput');
-        const sendButton = document.getElementById('sendButton');
+        const stages = [
+            { id: 'welcome', label: '0% 认识自己' },
+            { id: 'cold', label: '30% 看见你的需要' },
+            { id: 'round1', label: '45% 当你被照顾时' },
+            { id: 'round2', label: '60% 当你开心时' },
+            { id: 'round3', label: '75% 当你疲惫时' },
+            { id: 'sliders', label: '85% 打磨细节' },
+            { id: 'ranking', label: '90% 取舍排序' },
+            { id: 'reflection', label: '95% 写下此刻' },
+            { id: 'result', label: '100% 收获爱语画像' }
+        ];
 
-        let messages = [];
-        let isGenerating = false;
-        let currentTemperature = 0.8;
-        let currentTopK = 50;
+        const loveLanguages = {
+            WA: { name: '肯定的言语', color: '#f7d9b6', note: '需要听见被看见与被肯定' },
+            QT: { name: '精心时刻', color: '#cce6d5', note: '被专注陪伴与倾听的安全感' },
+            RG: { name: '接受礼物', color: '#e0d3f2', note: '被记得、被惊喜的仪式感' },
+            AS: { name: '服务的行动', color: '#c3d6f4', note: '有人一起扛事的踏实' },
+            PT: { name: '身体的触碰', color: '#f0c6c6', note: '用靠近与拥抱确认亲密' }
+        };
 
-        chatInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 200) + 'px';
-            sendButton.disabled = !this.value.trim() || isGenerating;
-        });
-
-        function handleKeyDown(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
+        const coldStartQuestions = [
+            {
+                id: 'c1',
+                title: '当你感觉很累时，哪一种最能安抚你？',
+                options: [
+                    { label: '被人抱一下', tag: 'PT', feedback: '你用靠近来补充能量。' },
+                    { label: '有人帮忙收尾麻烦', tag: 'AS', feedback: '你在意有人和你一起扛。' },
+                    { label: '有人安静听你吐槽', tag: 'QT', feedback: '被听见比被解决更重要。' },
+                    { label: '收到一句肯定或鼓励', tag: 'WA', feedback: '一句贴心话能帮你充电。' },
+                    { label: '一份小礼物或惊喜', tag: 'RG', feedback: '你喜欢被记得、被惦记。' },
+                ],
+                weight: 2.5
+            },
+            {
+                id: 'c2',
+                title: '在一段关系里，最让你失望的是？',
+                options: [
+                    { label: '明明在一起却各玩各的', tag: 'QT', feedback: '你需要专注的陪伴。' },
+                    { label: '从来不主动拥抱你', tag: 'PT', feedback: '身体距离就是心理距离。' },
+                    { label: '做了很多却没一句肯定', tag: 'WA', feedback: '你想听见自己的努力被看见。' },
+                    { label: '需要帮忙却总是自己扛', tag: 'AS', feedback: '你渴望有人一起分担。' },
+                    { label: '重要日子总被忘记', tag: 'RG', feedback: '被记得的仪式感对你很关键。' },
+                ],
+                weight: 2.5
+            },
+            {
+                id: 'c3',
+                title: '如果用一句话概括，你最想要的爱是——',
+                options: [
+                    { label: '有人真正陪着我', tag: 'QT', feedback: '陪伴对你等于被爱。' },
+                    { label: '有人让你觉得安心、靠得住', tag: 'AS', feedback: '行动比语言更让你放心。' },
+                    { label: '有人总是轻轻地靠近我', tag: 'PT', feedback: '触碰让你觉得不被忽略。' },
+                    { label: '有人说出那些你需要听的话', tag: 'WA', feedback: '话语能直达你的心。' },
+                    { label: '有人记得惊喜与仪式感', tag: 'RG', feedback: '被惦记是你爱的证明。' },
+                ],
+                weight: 2.5
             }
-        }
+        ];
 
-        document.addEventListener('keydown', function(event) {
-            // Ctrl+Shift+N for new conversation
-            if (event.ctrlKey && event.shiftKey && event.key === 'N') {
-                event.preventDefault();
-                if (!isGenerating) {
-                    newConversation();
-                }
-            }
-        });
-
-        function newConversation() {
-            messages = [];
-            chatWrapper.innerHTML = '';
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-            sendButton.disabled = false;
-            isGenerating = false;
-            chatInput.focus();
-        }
-
-        function addMessage(role, content, messageIndex = null) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${role}`;
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.textContent = content;
-
-            // Add click handler for user messages to enable editing
-            if (role === 'user' && messageIndex !== null) {
-                contentDiv.setAttribute('data-message-index', messageIndex);
-                contentDiv.setAttribute('title', 'Click to edit and restart from here');
-                contentDiv.addEventListener('click', function() {
-                    if (!isGenerating) {
-                        editMessage(messageIndex);
-                    }
-                });
-            }
-
-            // Add click handler for assistant messages to enable regeneration
-            if (role === 'assistant' && messageIndex !== null) {
-                contentDiv.setAttribute('data-message-index', messageIndex);
-                contentDiv.setAttribute('title', 'Click to regenerate this response');
-                contentDiv.addEventListener('click', function() {
-                    if (!isGenerating) {
-                        regenerateMessage(messageIndex);
-                    }
-                });
-            }
-
-            messageDiv.appendChild(contentDiv);
-            chatWrapper.appendChild(messageDiv);
-
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-            return contentDiv;
-        }
-
-        function editMessage(messageIndex) {
-            // Find the message in the messages array
-            if (messageIndex < 0 || messageIndex >= messages.length) return;
-
-            const messageToEdit = messages[messageIndex];
-            if (messageToEdit.role !== 'user') return;
-
-            // Copy message content to input
-            chatInput.value = messageToEdit.content;
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 200) + 'px';
-
-            // Remove this message and all subsequent messages from the array
-            messages = messages.slice(0, messageIndex);
-
-            // Remove message elements from DOM starting from messageIndex
-            const allMessages = chatWrapper.querySelectorAll('.message');
-            for (let i = messageIndex; i < allMessages.length; i++) {
-                allMessages[i].remove();
-            }
-
-            // Enable send button and focus input
-            sendButton.disabled = false;
-            chatInput.focus();
-        }
-
-        async function generateAssistantResponse() {
-            isGenerating = true;
-            sendButton.disabled = true;
-
-            const assistantContent = addMessage('assistant', '');
-            assistantContent.innerHTML = '<span class="typing-indicator"></span>';
-
-            try {
-                const response = await fetch(`${API_URL}/chat/completions`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+        const rounds = [
+            {
+                id: 'round1',
+                title: '第 1 轮：当你被照顾时',
+                questions: [
+                    {
+                        id: 'r1q1',
+                        title: '加班到很晚回家，更打动你的是：',
+                        options: [
+                            { label: '他帮你把宵夜热好、桌子收拾干净', tag: 'AS', feedback: '有人替你操心生活细节。' },
+                            { label: '他抱着你说：今天辛苦了', tag: 'PT', secondary: 'WA', feedback: '身体靠近带来安全感。' }
+                        ]
                     },
-                    body: JSON.stringify({
-                        messages: messages,
-                        temperature: currentTemperature,
-                        top_k: currentTopK,
-                        max_tokens: 512
-                    }),
+                    {
+                        id: 'r1q2',
+                        title: '身体不舒服时，你更需要：',
+                        options: [
+                            { label: '有人陪你去看医生或准备药', tag: 'AS', feedback: '实际的帮助最能安抚你。' },
+                            { label: '有人坐在旁边，握着手陪着你', tag: 'PT', feedback: '被握住的那刻不再孤单。' }
+                        ]
+                    },
+                    {
+                        id: 'r1q3',
+                        title: '周末在家，什么更让你觉得被爱？',
+                        options: [
+                            { label: '一起做顿饭、边做边聊', tag: 'QT', feedback: '一起的时光让家更温暖。' },
+                            { label: '他提前准备了你喜欢的小甜点', tag: 'RG', feedback: '被记得的小心思让你被宠。' }
+                        ]
+                    },
+                    {
+                        id: 'r1q4',
+                        title: '遇到困难，需要鼓励时，你更喜欢：',
+                        options: [
+                            { label: '听到他认真说“我相信你能做到”', tag: 'WA', feedback: '语言是你能量的来源。' },
+                            { label: '他帮你排好优先级、一起动手', tag: 'AS', feedback: '行动让你感到被支撑。' }
+                        ]
+                    },
+                    {
+                        id: 'r1q5',
+                        title: '忙碌一天后，见面时你更想：',
+                        options: [
+                            { label: '直接一个拥抱或摸摸头', tag: 'PT', feedback: '肢体温度帮你卸下防备。' },
+                            { label: '听他认真问你今天的感受', tag: 'QT', feedback: '被倾听让你觉得被接住。' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'round2',
+                title: '第 2 轮：当你开心时',
+                questions: [
+                    {
+                        id: 'r2q1',
+                        title: '完成了重要项目，更让你觉得被爱的是：',
+                        options: [
+                            { label: '他在朋友圈夸你超厉害', tag: 'WA', feedback: '公开的赞美让你被看见。' },
+                            { label: '他带你去吃想吃很久的餐厅', tag: 'RG', secondary: 'QT', feedback: '庆祝仪式让喜悦加倍。' }
+                        ]
+                    },
+                    {
+                        id: 'r2q2',
+                        title: '假设有整整一个周末，你更期待：',
+                        options: [
+                            { label: '两人窝在家里看电影、做饭、聊天', tag: 'QT', feedback: '简单相处就是幸福。' },
+                            { label: '一个精心设计的惊喜行程', tag: 'RG', feedback: '你喜欢被用心准备的惊喜。' }
+                        ]
+                    },
+                    {
+                        id: 'r2q3',
+                        title: '你更喜欢收到怎样的表扬？',
+                        options: [
+                            { label: '细节具体的肯定，比如指出你的闪光点', tag: 'WA', feedback: '细节赞美让你信任。' },
+                            { label: '实际的奖励，比如请你放松休息', tag: 'AS', feedback: '奖励里包含被照顾的味道。' }
+                        ]
+                    },
+                    {
+                        id: 'r2q4',
+                        title: '约会时，哪种细节让你觉得被放在心上？',
+                        options: [
+                            { label: '对方全程放下手机，专注陪你', tag: 'QT', feedback: '专注是你的安全感。' },
+                            { label: '对方会主动挽手、靠近你', tag: 'PT', feedback: '触碰让你确认亲密。' }
+                        ]
+                    },
+                    {
+                        id: 'r2q5',
+                        title: '庆祝纪念日，你更想要：',
+                        options: [
+                            { label: '被写下一封真诚的手写信', tag: 'WA', feedback: '文字是你珍藏的浪漫。' },
+                            { label: '一个准备已久的惊喜礼物', tag: 'RG', feedback: '仪式感让当下更被重视。' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'round3',
+                title: '第 3 轮：当你疲惫时',
+                questions: [
+                    {
+                        id: 'r3q1',
+                        title: '情绪低落时，更想听到：',
+                        options: [
+                            { label: '“我听到了，也理解你的辛苦”', tag: 'WA', feedback: '被理解的语言帮你松一口气。' },
+                            { label: '“我来帮你搞定今天的杂事”', tag: 'AS', feedback: '一起行动能让你踏实下来。' }
+                        ]
+                    },
+                    {
+                        id: 'r3q2',
+                        title: '出差回家，最希望发生什么？',
+                        options: [
+                            { label: '一个长长的拥抱或肩膀靠一靠', tag: 'PT', feedback: '距离后更需要身体的回应。' },
+                            { label: '家里已经收拾好，你只需要放松', tag: 'AS', feedback: '有人打点好一切让你安心。' }
+                        ]
+                    },
+                    {
+                        id: 'r3q3',
+                        title: '忙到没时间吃饭时，最暖心的是：',
+                        options: [
+                            { label: '有人送上一份热乎的餐食', tag: 'AS', feedback: '照顾生理需求让你感到被爱。' },
+                            { label: '有人发来一句：今天别忘了好好吃饭', tag: 'WA', feedback: '一句提醒让你觉得被惦记。' }
+                        ]
+                    },
+                    {
+                        id: 'r3q4',
+                        title: '吵架后，什么让你愿意和好？',
+                        options: [
+                            { label: '对方向你走近，轻轻拥抱', tag: 'PT', feedback: '肢体先和解，心才慢慢放软。' },
+                            { label: '对方清晰表达自己的感受与道歉', tag: 'WA', feedback: '真诚的表达帮你恢复信任。' }
+                        ]
+                    },
+                    {
+                        id: 'r3q5',
+                        title: '被误解时，哪种安抚更有效？',
+                        options: [
+                            { label: '花时间听你解释、耐心陪伴', tag: 'QT', feedback: '被聆听让你觉得被尊重。' },
+                            { label: '主动帮你处理因为误会带来的麻烦', tag: 'AS', feedback: '有人收尾让你安心回归。' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const sliderQuestions = [
+            { id: 's1', title: '听到对方说：“我真的很以你为傲。”', tag: 'WA' },
+            { id: 's2', title: '对方在我说话时放下手机、全程看着我', tag: 'QT' },
+            { id: 's3', title: '走路时会自然牵我手', tag: 'PT' },
+            { id: 's4', title: '我忙碌时，他会替我处理部分琐事', tag: 'AS' },
+            { id: 's5', title: '他记得纪念日、准备小礼物', tag: 'RG' }
+        ];
+
+        const rankingOptions = [
+            { id: 'rk1', label: '陪他做他喜欢做的事', tag: 'QT' },
+            { id: 'rk2', label: '经常制造惊喜、小礼物', tag: 'RG' },
+            { id: 'rk3', label: '见到他就想抱一下、摸头、亲亲', tag: 'PT' },
+            { id: 'rk4', label: '帮他处理生活里的麻烦', tag: 'AS' },
+            { id: 'rk5', label: '时不时真诚地夸他、鼓励他', tag: 'WA' }
+        ];
+
+        const scores = { WA: 0, QT: 0, RG: 0, AS: 0, PT: 0 };
+        const answered = {};
+        let currentStage = 'welcome';
+        let miniFeedbackTimer = null;
+
+        const content = document.getElementById('content');
+        const storySteps = document.getElementById('storySteps');
+
+        function renderStorySteps() {
+            storySteps.innerHTML = '';
+            stages.forEach(s => {
+                const div = document.createElement('div');
+                div.className = 'story-step' + (currentStage === s.id ? ' active' : '');
+                div.innerHTML = `<div class="dot">${s.label.split(' ')[0]}</div><div class="text">${s.label.split(' ').slice(1).join(' ')}</div>`;
+                storySteps.appendChild(div);
+            });
+        }
+
+        function setStage(stage) {
+            currentStage = stage;
+            renderStorySteps();
+            if (stage === 'welcome') return renderWelcome();
+            if (stage === 'cold') return renderColdStart();
+            if (stage === 'round1' || stage === 'round2' || stage === 'round3') return renderRound(stage);
+            if (stage === 'sliders') return renderSliders();
+            if (stage === 'ranking') return renderRanking();
+            if (stage === 'reflection') return renderReflection();
+            if (stage === 'result') return renderResult();
+        }
+
+        function renderWelcome() {
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel hero';
+            panel.innerHTML = `
+                <div class="pill">5 轮轻量互动 · 像聊天一样完成</div>
+                <h1 style="margin:0;font-size:32px;">我们常常很努力去爱，却不一定用对方式。</h1>
+                <p>接下来 5 分钟，帮你找到你真正听得懂的爱语。一步步来，不需要一次性 30 题。</p>
+                <div class="hero-actions">
+                    <button class="primary" id="startBtn">开始探索</button>
+                    <button class="secondary" onclick="setStage('about')" disabled title="即将上线">爱的五种语言是？</button>
+                </div>
+                <div class="mini-feedback">不收集隐私、不做心理诊断，只是一个关系小工具。</div>
+            `;
+            content.appendChild(panel);
+            document.getElementById('startBtn').onclick = () => setStage('cold');
+        }
+
+        function renderColdStart() {
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.innerHTML = `<h2>冷启动 · 直觉预判</h2><p>先听听你的直觉，选出最贴近你的情境。</p>`;
+            const group = document.createElement('div');
+            group.className = 'question-group';
+
+            coldStartQuestions.forEach(q => {
+                const block = document.createElement('div');
+                block.className = 'question';
+                block.innerHTML = `<h3>${q.title}</h3>`;
+                const opts = document.createElement('div');
+                opts.className = 'options';
+                q.options.forEach(opt => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option';
+                    btn.textContent = opt.label;
+                    btn.onclick = () => selectOption(q.id, opt, q.weight);
+                    btn.dataset.question = q.id;
+                    btn.dataset.lang = opt.tag;
+                    opts.appendChild(btn);
                 });
+                block.appendChild(opts);
+                block.appendChild(createMiniFeedback(q.id));
+                group.appendChild(block);
+            });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            panel.appendChild(group);
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const next = document.createElement('button');
+            next.className = 'primary';
+            next.textContent = '下一步：场景对话';
+            next.onclick = () => setStage('round1');
+            next.id = 'coldNext';
+            nav.appendChild(next);
+            panel.appendChild(nav);
+            content.appendChild(panel);
+            refreshSelections();
+            validateCold();
+        }
+
+        function selectOption(questionId, option, weight = 2) {
+            const prev = answered[questionId];
+            if (prev) {
+                scores[prev.tag] -= prev.weight;
+            }
+            answered[questionId] = { tag: option.tag, weight };
+            scores[option.tag] += weight;
+            if (option.secondary) {
+                scores[option.secondary] += weight * 0.5;
+            }
+            refreshSelections();
+            validateCold();
+            if (currentStage.startsWith('round')) {
+                validateRound(currentStage);
+            }
+            showFeedback(questionId, option.feedback);
+        }
+
+        function refreshSelections() {
+            document.querySelectorAll('.option').forEach(el => {
+                const qid = el.dataset.question;
+                const lang = el.dataset.lang;
+                if (qid && answered[qid]?.tag === lang) {
+                    el.classList.add('selected');
+                } else {
+                    el.classList.remove('selected');
                 }
+            });
+        }
 
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder();
-                let fullResponse = '';
-                assistantContent.textContent = '';
+        function validateCold() {
+            const next = document.getElementById('coldNext');
+            if (!next) return;
+            const filled = coldStartQuestions.every(q => answered[q.id]);
+            next.disabled = !filled;
+        }
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
+        function renderRound(roundId) {
+            const data = rounds.find(r => r.id === roundId);
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.innerHTML = `<h2>${data.title}</h2><p>像聊天一样，选出更能打动你的场景。</p>`;
+            const group = document.createElement('div');
+            group.className = 'question-group';
+            data.questions.forEach(q => {
+                const block = document.createElement('div');
+                block.className = 'question';
+                block.innerHTML = `<h3>${q.title}</h3>`;
+                const opts = document.createElement('div');
+                opts.className = 'options';
+                q.options.forEach(opt => {
+                    const btn = document.createElement('div');
+                    btn.className = 'option';
+                    btn.textContent = opt.label;
+                    btn.onclick = () => selectOption(q.id, opt, 2);
+                    btn.dataset.question = q.id;
+                    btn.dataset.lang = opt.tag;
+                    opts.appendChild(btn);
+                });
+                block.appendChild(opts);
+                block.appendChild(createMiniFeedback(q.id));
+                group.appendChild(block);
+            });
+            panel.appendChild(group);
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const prevBtn = document.createElement('button');
+            prevBtn.className = 'secondary';
+            prevBtn.textContent = '上一步';
+            prevBtn.onclick = () => navigateBack(roundId);
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'primary';
+            nextBtn.textContent = nextRoundLabel(roundId);
+            nextBtn.onclick = () => setStage(nextRoundId(roundId));
+            nextBtn.disabled = !data.questions.every(q => answered[q.id]);
+            nextBtn.id = 'nextBtn';
+            nav.appendChild(prevBtn);
+            nav.appendChild(nextBtn);
+            panel.appendChild(nav);
+            content.appendChild(panel);
+            refreshSelections();
+            setTimeout(() => validateRound(roundId), 0);
+        }
 
-                    const chunk = decoder.decode(value);
-                    const lines = chunk.split('\n');
+        function navigateBack(roundId) {
+            const index = stages.findIndex(s => s.id === roundId);
+            if (index > 0) setStage(stages[index - 1].id);
+        }
 
-                    for (const line of lines) {
-                        if (line.startsWith('data: ')) {
-                            try {
-                                const data = JSON.parse(line.slice(6));
-                                if (data.token) {
-                                    fullResponse += data.token;
-                                    assistantContent.textContent = fullResponse;
-                                    chatContainer.scrollTop = chatContainer.scrollHeight;
-                                }
-                            } catch (e) {
-                            }
+        function nextRoundId(roundId) {
+            if (roundId === 'round1') return 'round2';
+            if (roundId === 'round2') return 'round3';
+            return 'sliders';
+        }
+
+        function nextRoundLabel(roundId) {
+            if (roundId === 'round3') return '下一步：权重打分';
+            return '下一轮';
+        }
+
+        function validateRound(roundId) {
+            const data = rounds.find(r => r.id === roundId);
+            const nextBtn = document.getElementById('nextBtn');
+            if (nextBtn) nextBtn.disabled = !data.questions.every(q => answered[q.id]);
+        }
+
+        function createMiniFeedback(questionId) {
+            const div = document.createElement('div');
+            div.className = 'mini-feedback';
+            div.id = `feedback-${questionId}`;
+            div.textContent = '选完后会有一句小提示。';
+            return div;
+        }
+
+        function showFeedback(questionId, text) {
+            const target = document.getElementById(`feedback-${questionId}`);
+            if (!target) return;
+            target.textContent = text;
+            target.style.background = 'rgba(142, 122, 209, 0.12)';
+            if (miniFeedbackTimer) clearTimeout(miniFeedbackTimer);
+            miniFeedbackTimer = setTimeout(() => {
+                target.style.background = 'rgba(142, 122, 209, 0.08)';
+            }, 800);
+        }
+
+        function renderSliders() {
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.innerHTML = `<h2>权重 · 滑块打分</h2><p>1 = 完全不重要，5 = 非常重要。分数会放大到 1.2 倍计入模型。</p>`;
+            const wrap = document.createElement('div');
+            wrap.className = 'question-group';
+            sliderQuestions.forEach(q => {
+                const row = document.createElement('div');
+                row.className = 'slider-row';
+                row.innerHTML = `<div><strong>${q.title}</strong><div class="progress-label">左右滑动，1-5 分</div></div>`;
+                const ctrl = document.createElement('div');
+                const range = document.createElement('input');
+                range.type = 'range';
+                range.min = 1; range.max = 5; range.value = answered[q.id]?.value || 3;
+                if (!answered[q.id]) {
+                    answered[q.id] = { value: parseInt(range.value, 10) };
+                    scores[q.tag] += parseInt(range.value, 10) * 1.2;
+                }
+                const value = document.createElement('div');
+                value.textContent = answered[q.id]?.value || 3;
+                value.style.textAlign = 'right';
+                range.oninput = () => {
+                    value.textContent = range.value;
+                };
+                range.onchange = () => handleSlider(q, parseInt(range.value), value);
+                ctrl.appendChild(range);
+                row.appendChild(ctrl);
+                row.appendChild(value);
+                wrap.appendChild(row);
+            });
+            panel.appendChild(wrap);
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const prev = document.createElement('button');
+            prev.className = 'secondary';
+            prev.textContent = '上一步';
+            prev.onclick = () => setStage('round3');
+            const next = document.createElement('button');
+            next.className = 'primary';
+            next.textContent = '下一步：排序取舍';
+            next.onclick = () => setStage('ranking');
+            nav.append(prev, next);
+            panel.appendChild(nav);
+            content.appendChild(panel);
+        }
+
+        function handleSlider(question, value, valueEl) {
+            const previous = answered[question.id];
+            if (previous) {
+                scores[question.tag] -= previous.value * 1.2;
+            }
+            answered[question.id] = { value };
+            scores[question.tag] += value * 1.2;
+            valueEl.textContent = value;
+        }
+
+        function renderRanking() {
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel';
+            panel.innerHTML = `<h2>排序 · 只能保留 3 种</h2><p>拖动（或轻触让它到最前）排序，选择你最想保留的 3 种爱别人的方式。</p>`;
+            const list = document.createElement('div');
+            list.className = 'rank-list';
+            rankingOptions.forEach(opt => {
+                const item = document.createElement('div');
+                item.className = 'rank-item';
+                item.draggable = true;
+                item.dataset.id = opt.id;
+                item.innerHTML = `<div class="rank-handle">☰</div><div class="rank-label">${opt.label}</div>`;
+                item.addEventListener('click', () => {
+                    if (window.matchMedia('(pointer: coarse)').matches) {
+                        list.insertBefore(item, list.firstChild);
+                    }
+                });
+                list.appendChild(item);
+            });
+            enableDrag(list);
+            panel.appendChild(list);
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const prev = document.createElement('button');
+            prev.className = 'secondary';
+            prev.textContent = '上一步';
+            prev.onclick = () => setStage('sliders');
+            const next = document.createElement('button');
+            next.className = 'primary';
+            next.textContent = '下一步：写点心情';
+            next.onclick = () => {
+                applyRanking(list);
+                setStage('reflection');
+            };
+            nav.append(prev, next);
+            panel.appendChild(nav);
+            content.appendChild(panel);
+        }
+
+        function enableDrag(list) {
+            let dragging;
+            list.querySelectorAll('.rank-item').forEach(item => {
+                item.addEventListener('dragstart', () => {
+                    dragging = item;
+                    item.style.opacity = '0.6';
+                });
+                item.addEventListener('dragend', () => {
+                    dragging.style.opacity = '1';
+                    dragging = null;
+                });
+                item.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    const rect = item.getBoundingClientRect();
+                    const offset = e.clientY - rect.top;
+                    const shouldInsertBefore = offset < rect.height / 2;
+                    if (dragging && dragging !== item) {
+                        if (shouldInsertBefore) {
+                            list.insertBefore(dragging, item);
+                        } else {
+                            list.insertBefore(dragging, item.nextSibling);
                         }
                     }
-                }
-
-                const assistantMessageIndex = messages.length;
-                messages.push({ role: 'assistant', content: fullResponse });
-
-                // Add click handler to regenerate this assistant message
-                assistantContent.setAttribute('data-message-index', assistantMessageIndex);
-                assistantContent.setAttribute('title', 'Click to regenerate this response');
-                assistantContent.addEventListener('click', function() {
-                    if (!isGenerating) {
-                        regenerateMessage(assistantMessageIndex);
-                    }
                 });
-
-            } catch (error) {
-                console.error('Error:', error);
-                assistantContent.innerHTML = `<div class="error-message">Error: ${error.message}</div>`;
-            } finally {
-                isGenerating = false;
-                sendButton.disabled = !chatInput.value.trim();
-            }
-        }
-
-        async function regenerateMessage(messageIndex) {
-            // Find the message in the messages array
-            if (messageIndex < 0 || messageIndex >= messages.length) return;
-
-            const messageToRegenerate = messages[messageIndex];
-            if (messageToRegenerate.role !== 'assistant') return;
-
-            // Remove this message and all subsequent messages from the array
-            messages = messages.slice(0, messageIndex);
-
-            // Remove message elements from DOM starting from messageIndex
-            const allMessages = chatWrapper.querySelectorAll('.message');
-            for (let i = messageIndex; i < allMessages.length; i++) {
-                allMessages[i].remove();
-            }
-
-            // Regenerate the assistant response
-            await generateAssistantResponse();
-        }
-
-        function handleSlashCommand(command) {
-            const parts = command.trim().split(/\s+/);
-            const cmd = parts[0].toLowerCase();
-            const arg = parts[1];
-
-            if (cmd === '/temperature') {
-                if (arg === undefined) {
-                    addMessage('console', `Current temperature: ${currentTemperature}`);
-                } else {
-                    const temp = parseFloat(arg);
-                    if (isNaN(temp) || temp < 0 || temp > 2) {
-                        addMessage('console', 'Invalid temperature. Must be between 0.0 and 2.0');
-                    } else {
-                        currentTemperature = temp;
-                        addMessage('console', `Temperature set to ${currentTemperature}`);
-                    }
-                }
-                return true;
-            } else if (cmd === '/topk') {
-                if (arg === undefined) {
-                    addMessage('console', `Current top-k: ${currentTopK}`);
-                } else {
-                    const topk = parseInt(arg);
-                    if (isNaN(topk) || topk < 1 || topk > 200) {
-                        addMessage('console', 'Invalid top-k. Must be between 1 and 200');
-                    } else {
-                        currentTopK = topk;
-                        addMessage('console', `Top-k set to ${currentTopK}`);
-                    }
-                }
-                return true;
-            } else if (cmd === '/clear') {
-                newConversation();
-                return true;
-            } else if (cmd === '/help') {
-                addMessage('console',
-                    'Available commands:\n' +
-                    '/temperature - Show current temperature\n' +
-                    '/temperature <value> - Set temperature (0.0-2.0)\n' +
-                    '/topk - Show current top-k\n' +
-                    '/topk <value> - Set top-k (1-200)\n' +
-                    '/clear - Clear conversation\n' +
-                    '/help - Show this help message'
-                );
-                return true;
-            }
-            return false;
-        }
-
-        async function sendMessage() {
-            const message = chatInput.value.trim();
-            if (!message || isGenerating) return;
-
-            // Handle slash commands
-            if (message.startsWith('/')) {
-                chatInput.value = '';
-                chatInput.style.height = 'auto';
-                handleSlashCommand(message);
-                return;
-            }
-
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-
-            const userMessageIndex = messages.length;
-            messages.push({ role: 'user', content: message });
-            addMessage('user', message, userMessageIndex);
-
-            await generateAssistantResponse();
-        }
-
-        sendButton.disabled = false;
-
-        // Autofocus the chat input on page load
-        chatInput.focus();
-
-        fetch(`${API_URL}/health`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Engine status:', data);
-            })
-            .catch(error => {
-                console.error('Engine not available:', error);
-                chatWrapper.innerHTML = '<div class="error-message">Engine not running. Please start engine.py first.</div>';
             });
+        }
+
+        function applyRanking(list) {
+            // remove previous ranking scores
+            rankingOptions.forEach(opt => {
+                if (answered[opt.id]) {
+                    scores[opt.tag] -= answered[opt.id].score;
+                }
+            });
+            const items = Array.from(list.querySelectorAll('.rank-item'));
+            items.slice(0, 3).forEach((item, index) => {
+                const opt = rankingOptions.find(o => o.id === item.dataset.id);
+                const award = index === 0 ? 3 : index === 1 ? 2 : 1;
+                scores[opt.tag] += award;
+                answered[opt.id] = { score: award };
+            });
+        }
+
+        function renderReflection() {
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel reflection';
+            panel.innerHTML = `<h2>收尾 · 写一句心情</h2><p>想写就写，这一刻的感受也很珍贵。</p>`;
+            const ta = document.createElement('textarea');
+            ta.placeholder = '在关系里，什么最让你有“被爱”的感觉？（可选）';
+            const select = document.createElement('select');
+            select.className = 'select';
+            ['单身','有稳定伴侣','已婚','其他/保密'].forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v; opt.textContent = v; select.appendChild(opt);
+            });
+            panel.appendChild(ta);
+            const label = document.createElement('p');
+            label.textContent = '你现在的关系状态是？';
+            panel.appendChild(label);
+            panel.appendChild(select);
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const prev = document.createElement('button');
+            prev.className = 'secondary';
+            prev.textContent = '上一步';
+            prev.onclick = () => setStage('ranking');
+            const next = document.createElement('button');
+            next.className = 'primary';
+            next.textContent = '生成我的爱语画像';
+            next.onclick = () => setStage('result');
+            nav.append(prev, next);
+            panel.appendChild(nav);
+            content.appendChild(panel);
+        }
+
+        function computeNormalizedScores() {
+            const values = Object.values(scores);
+            const maxVal = Math.max(...values, 1);
+            const normalized = {};
+            Object.keys(scores).forEach(key => {
+                normalized[key] = Math.round((scores[key] / maxVal) * 100);
+            });
+            return normalized;
+        }
+
+        function topLanguages(normalized) {
+            return Object.entries(normalized)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 2);
+        }
+
+        function renderRadar(normalized) {
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const size = 320;
+            const center = size / 2;
+            const radius = 120;
+            const angles = Object.keys(loveLanguages).map((_, i) => (Math.PI * 2 / 5) * i - Math.PI / 2);
+            const positions = angles.map((angle, idx) => {
+                const val = normalized[Object.keys(loveLanguages)[idx]] / 100;
+                return {
+                    x: center + Math.cos(angle) * radius * val,
+                    y: center + Math.sin(angle) * radius * val
+                };
+            });
+            const points = positions.map(p => `${p.x},${p.y}`).join(' ');
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('viewBox', `0 0 ${size} ${size}`);
+            // grid
+            for (let i = 1; i <= 4; i++) {
+                const r = (radius / 4) * i;
+                const gridPoints = angles.map(angle => `${center + Math.cos(angle) * r},${center + Math.sin(angle) * r}`).join(' ');
+                const poly = document.createElementNS(svgNS, 'polygon');
+                poly.setAttribute('points', gridPoints);
+                poly.setAttribute('fill', 'none');
+                poly.setAttribute('stroke', '#e6e0f5');
+                poly.setAttribute('stroke-width', '1');
+                svg.appendChild(poly);
+            }
+            const shape = document.createElementNS(svgNS, 'polygon');
+            shape.setAttribute('points', points);
+            shape.setAttribute('fill', 'rgba(142, 122, 209, 0.25)');
+            shape.setAttribute('stroke', '#8e7ad1');
+            shape.setAttribute('stroke-width', '2');
+            svg.appendChild(shape);
+            angles.forEach((angle, idx) => {
+                const labelX = center + Math.cos(angle) * (radius + 26);
+                const labelY = center + Math.sin(angle) * (radius + 26);
+                const text = document.createElementNS(svgNS, 'text');
+                text.setAttribute('x', labelX);
+                text.setAttribute('y', labelY);
+                text.setAttribute('text-anchor', 'middle');
+                text.setAttribute('dominant-baseline', 'middle');
+                text.setAttribute('fill', '#6f6572');
+                text.textContent = loveLanguages[Object.keys(loveLanguages)[idx]].name;
+                svg.appendChild(text);
+            });
+            return svg;
+        }
+
+        function renderResult() {
+            const normalized = computeNormalizedScores();
+            const top2 = topLanguages(normalized);
+            content.innerHTML = '';
+            const panel = document.createElement('div');
+            panel.className = 'panel result-panel';
+            panel.innerHTML = `<h2>你的爱语画像</h2><p>这是基于刚才所有选择得出的偏好分布。分数以最高维度为 100 做归一化。</p>`;
+            const radar = document.createElement('div');
+            radar.className = 'radar';
+            radar.appendChild(renderRadar(normalized));
+            const legend = document.createElement('div');
+            legend.className = 'legend';
+            Object.entries(loveLanguages).forEach(([key, val]) => {
+                const span = document.createElement('span');
+                span.innerHTML = `<i style="background:${val.color}"></i>${val.name}`;
+                legend.appendChild(span);
+            });
+            radar.appendChild(legend);
+            panel.appendChild(radar);
+
+            const sparkles = document.createElement('div');
+            sparkles.className = 'sparkles';
+            Array.from({ length: 8 }).forEach(() => {
+                const dot = document.createElement('span');
+                dot.style.left = `${Math.random() * 100}%`;
+                dot.style.bottom = `${Math.random() * 40}%`;
+                sparkles.appendChild(dot);
+            });
+            panel.appendChild(sparkles);
+
+            const bars = document.createElement('div');
+            bars.className = 'question-group';
+            Object.entries(normalized).forEach(([key, val]) => {
+                const row = document.createElement('div');
+                row.className = 'bar-row';
+                row.innerHTML = `<div>${loveLanguages[key].name}</div><div class="bar-track"><div class="bar-fill" style="width:${val}%;"></div></div><div style="text-align:right;">${val}</div>`;
+                bars.appendChild(row);
+            });
+            panel.appendChild(bars);
+
+            const detail = document.createElement('div');
+            detail.className = 'result-grid';
+            top2.forEach(([key, val]) => {
+                const card = document.createElement('div');
+                card.className = 'question';
+                card.innerHTML = `
+                    <h3>${loveLanguages[key].name} · ${val}</h3>
+                    <p>${summaryFor(key)}</p>
+                    <div class="mini-feedback">建议：${tipsFor(key).join(' / ')}</div>
+                `;
+                detail.appendChild(card);
+            });
+            panel.appendChild(detail);
+
+            const tabs = document.createElement('div');
+            tabs.className = 'tabs';
+            const selfBtn = document.createElement('button');
+            selfBtn.className = 'tab-btn active';
+            selfBtn.textContent = '给你自己';
+            const otherBtn = document.createElement('button');
+            otherBtn.className = 'tab-btn';
+            otherBtn.textContent = '给 Ta 看';
+            tabs.append(selfBtn, otherBtn);
+            panel.appendChild(tabs);
+
+            const share = document.createElement('textarea');
+            share.className = 'share-box';
+            share.readOnly = true;
+            const shareText = generateShareText(top2);
+            share.value = shareText.self;
+            selfBtn.onclick = () => { share.value = shareText.self; selfBtn.classList.add('active'); otherBtn.classList.remove('active'); };
+            otherBtn.onclick = () => { share.value = shareText.other; otherBtn.classList.add('active'); selfBtn.classList.remove('active'); };
+            panel.appendChild(share);
+
+            const footer = document.createElement('p');
+            footer.style.marginTop = '12px';
+            footer.textContent = '从今天开始，试着用你真正听得懂的方式去爱自己。';
+            panel.appendChild(footer);
+
+            const nav = document.createElement('div');
+            nav.className = 'navigation';
+            const restart = document.createElement('button');
+            restart.className = 'secondary';
+            restart.textContent = '重新测一次';
+            restart.onclick = () => window.location.reload();
+            nav.appendChild(restart);
+            panel.appendChild(nav);
+
+            content.appendChild(panel);
+        }
+
+        function summaryFor(lang) {
+            switch (lang) {
+                case 'PT': return '你通过身体距离确认心理距离，拥抱、牵手能迅速让你降噪。';
+                case 'AS': return '有人和你一起扛现实是安全感来源，行动比语言更能安抚你。';
+                case 'QT': return '专注的陪伴和倾听是你的底色，时间与注意力让你感到被看见。';
+                case 'WA': return '精准的肯定与鼓励能给你能量，语言对你是心的窗口。';
+                case 'RG': return '记得你、给你惊喜的仪式感，让你确信自己被放在心上。';
+            }
+        }
+
+        function tipsFor(lang) {
+            switch (lang) {
+                case 'PT':
+                    return ['直接说出“我需要一个拥抱”', '在重要时刻主动靠近', '避免长时间的身体疏离'];
+                case 'AS':
+                    return ['把需要帮忙的事具体说出来', '在能力范围内也回馈行动', '留意对方的实际付出并表达感激'];
+                case 'QT':
+                    return ['约定无手机的陪伴时间', '用提问式倾听加深理解', '在情绪起伏时先陪伴再建议'];
+                case 'WA':
+                    return ['告诉对方哪些话语最能鼓励你', '避免批评时伤人分寸', '收集让你温暖的句子备用'];
+                case 'RG':
+                    return ['记录重要日子，提前准备', '小礼物也要附上心意说明', '用仪式感标记关系的节点'];
+            }
+        }
+
+        function generateShareText(top2) {
+            const primary = loveLanguages[top2[0][0]].name;
+            const secondary = loveLanguages[top2[1][0]].name;
+            return {
+                self: `我主要的爱语是：${primary} 和 ${secondary}。\n我会尝试主动说出自己的需要，也愿意练习用行动去回应爱。`,
+                other: `想让TA感到被爱：\n1️⃣ ${primary}：${summaryFor(top2[0][0])}\n2️⃣ ${secondary}：${summaryFor(top2[1][0])}\n这些比空口的承诺更有效。`
+            };
+        }
+
+        // initial render
+        renderStorySteps();
+        renderWelcome();
     </script>
 </body>
 </html>
